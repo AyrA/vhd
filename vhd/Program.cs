@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace vhd
 {
@@ -10,6 +8,31 @@ namespace vhd
     {
         static void Main(string[] args)
         {
+            Console.ReadKey(true);
         }
+
+#if DEBUG
+        static void MemberwiseCompare<T>(T obj1, T obj2)
+        {
+            if (obj1 == null)
+            {
+                throw new ArgumentNullException(nameof(obj1));
+            }
+            if (obj2 == null)
+            {
+                throw new ArgumentNullException(nameof(obj2));
+            }
+
+            Console.Error.WriteLine("{0,-20}\t{1}\t{2,-20}\t{3,-20} ({4})", "Property name", "Same", "Hash1", "Hash2", "Name");
+
+            foreach (var Prop in obj1.GetType().GetProperties())
+            {
+                var v1 = Prop.GetValue(obj1);
+                var v2 = Prop.GetValue(obj2);
+
+                Console.Error.WriteLine("{0,-20}\t{1}\t{2,-20}\t{3,-20} ({4})", Prop.Name, v1.Equals(v2), v1.GetHashCode(), v2.GetHashCode(), Prop.PropertyType.Name);
+            }
+        }
+#endif
     }
 }
