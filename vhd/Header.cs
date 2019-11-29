@@ -329,6 +329,10 @@ namespace vhd
             {
                 throw new FormatException($"{nameof(CurrentSize)} can't be zero");
             }
+            if (CurrentSize % 512 != 0)
+            {
+                throw new FormatException($"{nameof(CurrentSize)} must be a multiple of 512");
+            }
 
             if (DiskGeometry == null)
             {
@@ -346,7 +350,7 @@ namespace vhd
             {
                 throw new FormatException($"{nameof(DiskGeometry)}.{nameof(CHS.SectorsPerTrack)} must be in the range of 1-{CHS.MAX_SECTORS_PER_TRACK}");
             }
-            if(!DiskGeometry.Equals(new CHS(CurrentSize)))
+            if (!DiskGeometry.Equals(new CHS(CurrentSize)))
             {
                 throw new FormatException($"{nameof(DiskGeometry)} does not matches {nameof(CurrentSize)}");
             }
