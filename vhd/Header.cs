@@ -163,6 +163,7 @@ namespace vhd
             DiskGeometry = new CHS(0, 0, 0);
             DiskType = VhdType.FixedDisk;
             DiskId = Guid.NewGuid();
+            Features = VhdFeatures.Reserved;
             Reserved = new byte[RESERVED_FIELD_SIZE];
             Checksum = ComputeChecksum();
         }
