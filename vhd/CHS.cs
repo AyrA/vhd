@@ -49,7 +49,7 @@ namespace vhd
         /// Creates a CHS instance with the reference calculation from microsoft
         /// </summary>
         /// <param name="totalSectors"></param>
-        public CHS(long totalSectors)
+        public CHS(ulong totalSectors)
         {
             int cylinderTimesHeads = 0;
 
@@ -61,13 +61,13 @@ namespace vhd
             {
                 SectorsPerTrack = MAX_SECTORS_PER_TRACK;
                 Heads = MAX_HEADS;
-                cylinderTimesHeads = (int)(totalSectors / SectorsPerTrack);
+                cylinderTimesHeads = (int)(totalSectors / (ulong)SectorsPerTrack);
             }
             else
             {
                 //Begin with 17 sectors per track
                 SectorsPerTrack = 17;
-                cylinderTimesHeads = (int)(totalSectors / SectorsPerTrack);
+                cylinderTimesHeads = (int)(totalSectors / (ulong)SectorsPerTrack);
                 Heads = Math.Max(4, (cylinderTimesHeads + 1023) / 1024);
 
                 //If too many heads or too many cylinders, increase the sectors per track
@@ -75,14 +75,14 @@ namespace vhd
                 {
                     SectorsPerTrack = 31;
                     Heads = 16;
-                    cylinderTimesHeads = (int)(totalSectors / SectorsPerTrack);
+                    cylinderTimesHeads = (int)(totalSectors / (ulong)SectorsPerTrack);
                 }
                 //If still too many cylinders, increase the sectors per track further
                 if (cylinderTimesHeads >= (Heads * 1024))
                 {
                     SectorsPerTrack = 63;
                     Heads = 16;
-                    cylinderTimesHeads = (int)(totalSectors / SectorsPerTrack);
+                    cylinderTimesHeads = (int)(totalSectors / (ulong)SectorsPerTrack);
                 }
             }
             Cylinders = cylinderTimesHeads / Heads;
