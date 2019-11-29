@@ -260,114 +260,119 @@ namespace vhd
             var E = Encoding.Default;
             if (Cookie == null || E.GetBytes(Cookie).Length != 8)
             {
-                throw new FormatException("Cookie is not an 8 byte string");
+                throw new FormatException($"{nameof(Cookie)} is not an 8 byte string");
             }
             if (!Enum.IsDefined(typeof(VhdFeatures), Features))
             {
-                throw new FormatException("Features is not one or a combination of the defined enum values");
+                throw new FormatException($"{nameof(Features)} is not one or a combination of the defined enum values");
             }
             if (!Features.HasFlag(VhdFeatures.Reserved))
             {
-                throw new FormatException("Features must have the reservedflag set");
+                throw new FormatException($"{nameof(Features)} must have the reservedflag set");
             }
             if ((int)Features >= ((int)VhdFeatures.Reserved << 1))
             {
-                throw new FormatException("Features must have undefined bits set to zero");
+                throw new FormatException($"{nameof(Features)} must have undefined bits set to zero");
             }
 
             if (FileFormatVersion == null)
             {
-                throw new FormatException("FileFormatVersion must be defined");
+                throw new FormatException($"{nameof(FileFormatVersion)} must be defined");
             }
             if (!Tools.InRange(ushort.MinValue, FileFormatVersion.Major, ushort.MaxValue))
             {
-                throw new FormatException($"FileFormatVersion.Major must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new FormatException($"{nameof(FileFormatVersion)}.{nameof(Version.Major)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
             }
             if (!Tools.InRange(ushort.MinValue, FileFormatVersion.Major, ushort.MaxValue))
             {
-                throw new FormatException($"FileFormatVersion.Minor must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new FormatException($"{nameof(FileFormatVersion)}.{nameof(Version.Minor)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
             }
 
             if (DiskType == VhdType.FixedDisk && DataOffset != OFFSET_NONE)
             {
-                throw new FormatException($"DataOffset must be set to (OFFSET_NONE){OFFSET_NONE} for a fixed vhd type");
+                throw new FormatException($"{nameof(DataOffset)} must be set to ({nameof(OFFSET_NONE)}){OFFSET_NONE} for a fixed vhd type");
             }
 
             if (ToTimestamp(TimeStamp) < int.MinValue || ToTimestamp(TimeStamp) > int.MaxValue)
             {
-                throw new FormatException($"TimeStamp can't be more than {int.MinValue} or {int.MaxValue} seconds away from Jan 1, 2000");
+                throw new FormatException($"{nameof(TimeStamp)} can't be more than {int.MinValue} or {int.MaxValue} seconds away from Jan 1, 2000");
             }
 
             if (CreatorApplication == null || E.GetBytes(CreatorApplication).Length != 4)
             {
-                throw new FormatException("CreatorApplication is not a 4 byte string");
+                throw new FormatException($"{nameof(CreatorApplication)} is not a 4 byte string");
             }
 
             if (CreatorVersion == null)
             {
-                throw new FormatException("CreatorVersion must be defined");
+                throw new FormatException($"{nameof(CreatorVersion)} must be defined");
             }
             if (!Tools.InRange(ushort.MinValue, CreatorVersion.Major, ushort.MaxValue))
             {
-                throw new FormatException($"CreatorVersion.Major must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new FormatException($"{nameof(CreatorVersion)}.{nameof(Version.Major)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
             }
             if (!Tools.InRange(ushort.MinValue, CreatorVersion.Major, ushort.MaxValue))
             {
-                throw new FormatException($"CreatorVersion.Minor must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new FormatException($"{nameof(CreatorVersion)}.{nameof(Version.Major)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
             }
 
             if (CreatorHostOS == null || E.GetBytes(CreatorHostOS).Length != 4)
             {
-                throw new FormatException("CreatorHostOS is not a 4 byte string");
+                throw new FormatException($"{nameof(CreatorHostOS)} is not a 4 byte string");
             }
 
             if (OriginalSize == 0)
             {
-                throw new FormatException("OriginalSize can't be zero");
+                throw new FormatException($"{nameof(OriginalSize)} can't be zero");
             }
             if (CurrentSize == 0)
             {
-                throw new FormatException("CurrentSize can't be zero");
+                throw new FormatException($"{nameof(CurrentSize)} can't be zero");
             }
 
             if (DiskGeometry == null)
             {
-                throw new FormatException("DiskGeometry is not defined");
+                throw new FormatException($"{nameof(DiskGeometry)} is not defined");
             }
             if (DiskGeometry.Cylinders < 1 || DiskGeometry.Cylinders > CHS.MAX_CYLINDERS)
             {
-                throw new FormatException($"DiskGeometry.Cylinders must be in the range of 1-{CHS.MAX_CYLINDERS}");
+                throw new FormatException($"{nameof(DiskGeometry)}.{nameof(CHS.Cylinders)} must be in the range of 1-{CHS.MAX_CYLINDERS}");
             }
             if (DiskGeometry.Heads < 1 || DiskGeometry.Heads > CHS.MAX_HEADS)
             {
-                throw new FormatException($"DiskGeometry.Heads must be in the range of 1-{CHS.MAX_HEADS}");
+                throw new FormatException($"{nameof(DiskGeometry)}.{nameof(CHS.Heads)} must be in the range of 1-{CHS.MAX_HEADS}");
             }
             if (DiskGeometry.SectorsPerTrack < 1 || DiskGeometry.SectorsPerTrack > CHS.MAX_SECTORS_PER_TRACK)
             {
-                throw new FormatException($"DiskGeometry.SectorsPerTrack must be in the range of 1-{CHS.MAX_SECTORS_PER_TRACK}");
+                throw new FormatException($"{nameof(DiskGeometry)}.{nameof(CHS.SectorsPerTrack)} must be in the range of 1-{CHS.MAX_SECTORS_PER_TRACK}");
             }
+            if(!DiskGeometry.Equals(new CHS(CurrentSize)))
+            {
+                throw new FormatException($"{nameof(DiskGeometry)} does not matches {nameof(CurrentSize)}");
+            }
+
 
             if (!Enum.IsDefined(typeof(VhdType), DiskType))
             {
-                throw new FormatException("DiskType is not one of the defined enum values");
+                throw new FormatException($"{nameof(DiskType)} is not one of the defined enum values");
             }
 
             if (Checksum != ComputeChecksum())
             {
-                throw new FormatException("Checksum is invalid.");
+                throw new FormatException($"{nameof(Checksum)} is invalid.");
             }
 
             if (DiskId == Guid.Empty)
             {
-                throw new FormatException("DiskId is invalid");
+                throw new FormatException($"{nameof(DiskId)} is invalid");
             }
             if (Reserved == null || Reserved.Length != RESERVED_FIELD_SIZE)
             {
-                throw new FormatException($"Reserved must be {RESERVED_FIELD_SIZE} bytes long");
+                throw new FormatException($"{nameof(Reserved)} must be {RESERVED_FIELD_SIZE} bytes long");
             }
-            if (Reserved.Any(m => m > 0))
+            if (Reserved.Any(m => m != 0))
             {
-                throw new FormatException($"Reserved must be made up of nullbytes only");
+                throw new FormatException($"{nameof(Reserved)} must be made up of nullbytes only");
             }
         }
 
