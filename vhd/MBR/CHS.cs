@@ -21,8 +21,17 @@ namespace vhd.MBR
         /// </summary>
         public const int MAX_CYLINDERS = (0xF0 << 2) | 0xFF;
 
+        /// <summary>
+        /// Number of heads
+        /// </summary>
         public byte Heads { get; set; }
+        /// <summary>
+        /// Number of cylinders
+        /// </summary>
         public ushort Cylinders { get; set; }
+        /// <summary>
+        /// Number of sectors
+        /// </summary>
         public byte Sectors { get; set; }
 
         /// <summary>

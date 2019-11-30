@@ -1,10 +1,26 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace vhd
 {
     public static class Tools
     {
-        public static bool InRange(int low,int current,int high)
+        /// <summary>
+        /// Converts CHS to LBA
+        /// </summary>
+        /// <param name="CurrentCylinder">Current cylinder to access (0=first)</param>
+        /// <param name="CurrentHead">Current head to access (0=first)</param>
+        /// <param name="CurrentSector">Current sector to access (1=first)</param>
+        /// <param name="NumHeads">Number of heads on the disk (1=1)</param>
+        /// <param name="NumSectors">Number of sectors in each track (1=1)</param>
+        /// <remarks><paramref name="CurrentSector"/> is historically 1 based and not 0 based</remarks>
+        /// <returns>LBA value</returns>
+        public static long CHSToLBA(int CurrentCylinder, int CurrentHead, int CurrentSector, int NumHeads, int NumSectors)
+        {
+            return ((long)CurrentCylinder * NumHeads + CurrentHead) * NumSectors + (CurrentSector - 1L);
+        }
+
+        public static bool InRange(int low, int current, int high)
         {
             return current <= high && current >= low;
         }
