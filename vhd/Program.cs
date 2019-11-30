@@ -8,9 +8,11 @@ namespace vhd
     {
         static void Main(string[] args)
         {
-            using (var FS = File.Create(@"D:\Temp\100M.vhd"))
+            using (var FS = File.OpenRead(@"D:\VM\TestFixed.vhd"))
             {
-                VHD.CreateVHD(1024 * 1024 * 100, VhdType.FixedDisk, FS, false);
+                var BootSector = new MBR.MBR(FS);
+                Console.Error.WriteLine(BootSector.Partitions.Count(m => m.Type != MBR.PartitionType.Empty));
+                //VHD.CreateVHD(1024 * 1024 * 100, VhdType.FixedDisk, FS, false);
             }
 #if DEBUG
             Console.Error.WriteLine("#END");

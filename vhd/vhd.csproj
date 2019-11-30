@@ -46,6 +46,9 @@
     <Compile Include="CHS.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="Header.cs" />
+    <Compile Include="MBR\CHS.cs" />
+    <Compile Include="MBR\MBR.cs" />
+    <Compile Include="MBR\PartitionTableEntry.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools.cs" />
