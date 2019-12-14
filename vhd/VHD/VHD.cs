@@ -180,5 +180,31 @@ namespace vhd.VHD
                 .Where(m => m.LBAFirstSector > 0 && m.LBASectorCount > 0)
                 .Max(m => m.LBAFirstSector + (ulong)m.LBASectorCount - 1UL) * Footer.SECTOR_SIZE;
         }
+
+        /// <summary>
+        /// Converts a DateTime object into a timestamp
+        /// </summary>
+        /// <param name="DT">DateTime object</param>
+        /// <returns>Timestamp</returns>
+        public static double ToDiskTimestamp(DateTime DT)
+        {
+            return DT
+                .ToUniversalTime()
+                .Subtract(new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+                .TotalSeconds;
+        }
+
+        /// <summary>
+        /// Converts a Timestamp into a DateTime object
+        /// </summary>
+        /// <param name="Seconds">Number of seconds since 2000-01-01 00:00:00 UTC</param>
+        /// <returns>DateTime instance</returns>
+        /// <remarks><paramref name="Seconds"/> can also be negative although the format didn't exist back then</remarks>
+        public static DateTime FromDiskTimestamp(double Seconds)
+        {
+            return (new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+                .AddSeconds(Seconds)
+                .ToLocalTime();
+        }
     }
 }

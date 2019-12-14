@@ -64,19 +64,19 @@ namespace vhd.MBR
         {
             if (Signature == null || Signature.Length != 2)
             {
-                throw new FormatException($"{nameof(Signature)} is not a 2 byte value");
+                throw new ValidationException(nameof(Signature),"Must be a 2 byte value");
             }
             if (Signature[0]!=0x55 || Signature[1]!=0xAA)
             {
-                throw new FormatException($"{nameof(Signature)} is not 55-AA");
+                throw new ValidationException(nameof(Signature), "Must be two bytes: 0x55,0xAA");
             }
             if (BootstrapCode == null || BootstrapCode.Length != BOOTSTRAP_SIZE)
             {
-                throw new FormatException($"{nameof(BootstrapCode)} is not {BOOTSTRAP_SIZE} bytes long");
+                throw new ValidationException(nameof(BootstrapCode), $"Must be {BOOTSTRAP_SIZE} bytes long");
             }
             if (Partitions == null || Partitions.Length != PARTITION_COUNT)
             {
-                throw new FormatException($"{nameof(Partitions)} is not {PARTITION_COUNT} entries long");
+                throw new ValidationException(nameof(Partitions), $"Must be {PARTITION_COUNT} entries long");
             }
             for (var i = 0; i < PARTITION_COUNT; i++)
             {
@@ -86,7 +86,7 @@ namespace vhd.MBR
                 }
                 catch (Exception ex)
                 {
-                    throw new FormatException($"{nameof(Partitions)}[{i}] failed to validate", ex);
+                    throw new ValidationException(nameof(Partitions), $"Element at position {i} failed to validate", ex);
                 }
             }
         }

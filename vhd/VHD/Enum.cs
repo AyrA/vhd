@@ -62,6 +62,40 @@ namespace vhd.VHD
         Reserved_3 = 6
     }
 
+    public struct DataLocatorPlatformCode
+    {
+        /// <summary>
+        /// No data locator platform
+        /// </summary>
+        public const string NONE = "\0\0\0\0";
+        /// <summary>
+        /// Windows relative file name (ANSI)
+        /// </summary>
+        /// <remarks>Deprecated, use <see cref="W2K_UNI_REL"/> instead</remarks>
+        public const string W2K_REL = "Wi2r";
+        /// <summary>
+        /// Windows absolute file name (ANSI)
+        /// </summary>
+        /// <remarks>Deprecated, use <see cref="W2K_UNI_ABS"/> instead</remarks>
+        public const string W2K_ABS = "Wi2k";
+        /// <summary>
+        /// Windows relative file name (UTF-16)
+        /// </summary>
+        public const string W2K_UNI_REL = "W2ru";
+        /// <summary>
+        /// Windows absolute file name (UTF-16)
+        /// </summary>
+        public const string W2K_UNI_ABS = "W2ku";
+        /// <summary>
+        /// Mac OS alias stored as a blob
+        /// </summary>
+        public const string MAC = "Mac ";
+        /// <summary>
+        /// A file URL with UTF-8 encoding conforming to RFC 2396
+        /// </summary>
+        public const string MAC_OSX = "MacX";
+    }
+
     /// <summary>
     /// Contains known app strings
     /// </summary>

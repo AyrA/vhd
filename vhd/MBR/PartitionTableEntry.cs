@@ -88,35 +88,35 @@ namespace vhd.MBR
             }
             if (Status != PartitionStatus.Inactive && Status != PartitionStatus.Active)
             {
-                throw new FormatException($"{nameof(Status)} is invalid. Can only be {nameof(PartitionStatus.Active)} or {nameof(PartitionStatus.Inactive)}");
+                throw new ValidationException(nameof(Status), $"Must be {nameof(PartitionStatus.Active)} or {nameof(PartitionStatus.Inactive)}");
             }
             try
             {
                 FirstSector.Validate();
                 if (FirstSector.IsEmpty)
                 {
-                    throw new FormatException($"{nameof(CHS)} instance is empty");
+                    throw new ValidationException(nameof(FirstSector), "instance is empty");
                 }
             }
             catch (Exception ex)
             {
-                throw new FormatException($"{nameof(FirstSector)} failed to validate", ex);
+                throw new ValidationException(nameof(FirstSector), "failed to validate", ex);
             }
             try
             {
                 LastSector.Validate();
                 if (LastSector.IsEmpty)
                 {
-                    throw new FormatException($"{nameof(CHS)} instance is empty");
+                    throw new ValidationException(nameof(LastSector), "instance is empty");
                 }
             }
             catch (Exception ex)
             {
-                throw new FormatException($"{nameof(LastSector)} failed to validate", ex);
+                throw new ValidationException(nameof(LastSector), "failed to validate", ex);
             }
-            if(LBAFirstSector==0)
+            if (LBAFirstSector == 0)
             {
-                throw new FormatException($"{nameof(LBAFirstSector)} is zero");
+                throw new ValidationException(nameof(LBAFirstSector),"is zero");
             }
         }
     }

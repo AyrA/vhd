@@ -189,7 +189,7 @@ namespace vhd.VHD
             {
                 throw new ArgumentOutOfRangeException(nameof(Data), $"{HEADER_LENGTH} bytes expected, {Data.Length} given");
             }
-            using (var MS = new MemoryStream(Data))
+            using (var MS = new MemoryStream(Data, false))
             {
                 FromStream(MS);
             }
@@ -224,7 +224,7 @@ namespace vhd.VHD
                 //16
                 DataOffset = Tools.ToNetwork(BR.ReadUInt64());
                 //24
-                TimeStamp = FromTimeStamp(Tools.ToNetwork(BR.ReadInt32()));
+                TimeStamp = VHD.FromDiskTimestamp(Tools.ToNetwork(BR.ReadInt32()));
                 //28
                 CreatorApplication = E.GetString(BR.ReadBytes(4));
                 //32
@@ -263,123 +263,123 @@ namespace vhd.VHD
             var E = Encoding.Default;
             if (Cookie == null || E.GetBytes(Cookie).Length != 8)
             {
-                throw new FormatException($"{nameof(Cookie)} is not an 8 byte string");
+                throw new ValidationException(nameof(Cookie), "Must be an 8 byte (ANSI) string");
             }
             if (!Enum.IsDefined(typeof(VhdFeatures), Features))
             {
-                throw new FormatException($"{nameof(Features)} is not one or a combination of the defined enum values");
+                throw new ValidationException(nameof(Features), "Must be one or a combination of the defined enum values");
             }
             if (!Features.HasFlag(VhdFeatures.Reserved))
             {
-                throw new FormatException($"{nameof(Features)} must have the reservedflag set");
+                throw new ValidationException(nameof(Features), $"Must have '{nameof(VhdFeatures.Reserved)}' flag set");
             }
             if ((int)Features >= ((int)VhdFeatures.Reserved << 1))
             {
-                throw new FormatException($"{nameof(Features)} must have undefined bits set to zero");
+                throw new ValidationException(nameof(Features), "Must have undefined bits set to zero");
             }
 
             if (FileFormatVersion == null)
             {
-                throw new FormatException($"{nameof(FileFormatVersion)} must be defined");
+                throw new ValidationException(nameof(FileFormatVersion), "Must be defined");
             }
             if (!Tools.InRange(ushort.MinValue, FileFormatVersion.Major, ushort.MaxValue))
             {
-                throw new FormatException($"{nameof(FileFormatVersion)}.{nameof(Version.Major)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new ValidationException(nameof(FileFormatVersion) + "." + nameof(Version.Major), $"Must be in the range of {ushort.MinValue}-{ushort.MaxValue}");
             }
             if (!Tools.InRange(ushort.MinValue, FileFormatVersion.Major, ushort.MaxValue))
             {
-                throw new FormatException($"{nameof(FileFormatVersion)}.{nameof(Version.Minor)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new ValidationException(nameof(FileFormatVersion) + "." + nameof(Version.Minor), $"Must be in the range of {ushort.MinValue}-{ushort.MaxValue}");
             }
 
             if (DiskType == VhdType.FixedDisk && DataOffset != OFFSET_NONE)
             {
-                throw new FormatException($"{nameof(DataOffset)} must be set to ({nameof(OFFSET_NONE)}){OFFSET_NONE} for a fixed vhd type");
+                throw new ValidationException(nameof(DataOffset), $"Must be set to ({nameof(OFFSET_NONE)}){OFFSET_NONE} for a fixed vhd type");
             }
 
-            if (ToTimestamp(TimeStamp) < int.MinValue || ToTimestamp(TimeStamp) > int.MaxValue)
+            if (VHD.ToDiskTimestamp(TimeStamp) < int.MinValue || VHD.ToDiskTimestamp(TimeStamp) > int.MaxValue)
             {
-                throw new FormatException($"{nameof(TimeStamp)} can't be more than {int.MinValue} or {int.MaxValue} seconds away from Jan 1, 2000");
+                throw new ValidationException(nameof(TimeStamp), $"Must be at most {int.MinValue}-{int.MaxValue} seconds away from 2000-01-01 00:00:00 UTC");
             }
 
             if (CreatorApplication == null || E.GetBytes(CreatorApplication).Length != 4)
             {
-                throw new FormatException($"{nameof(CreatorApplication)} is not a 4 byte string");
+                throw new ValidationException(nameof(CreatorApplication), "Must be a 4 byte (ANSI) string");
             }
 
             if (CreatorVersion == null)
             {
-                throw new FormatException($"{nameof(CreatorVersion)} must be defined");
+                throw new ValidationException(nameof(CreatorVersion), "Must be defined");
             }
             if (!Tools.InRange(ushort.MinValue, CreatorVersion.Major, ushort.MaxValue))
             {
-                throw new FormatException($"{nameof(CreatorVersion)}.{nameof(Version.Major)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new ValidationException(nameof(CreatorVersion) + nameof(Version.Major), $"Must be in the range of {ushort.MinValue}-{ushort.MaxValue}");
             }
-            if (!Tools.InRange(ushort.MinValue, CreatorVersion.Major, ushort.MaxValue))
+            if (!Tools.InRange(ushort.MinValue, CreatorVersion.Minor, ushort.MaxValue))
             {
-                throw new FormatException($"{nameof(CreatorVersion)}.{nameof(Version.Major)} must be in the range of {ushort.MaxValue}-{ushort.MinValue}");
+                throw new ValidationException(nameof(CreatorVersion) + nameof(Version.Minor), $"Must be in the range of {ushort.MinValue}-{ushort.MaxValue}");
             }
 
             if (CreatorHostOS == null || E.GetBytes(CreatorHostOS).Length != 4)
             {
-                throw new FormatException($"{nameof(CreatorHostOS)} is not a 4 byte string");
+                throw new ValidationException(nameof(CreatorHostOS), "Is not a 4 byte (ANSI) string");
             }
 
             if (OriginalSize == 0)
             {
-                throw new FormatException($"{nameof(OriginalSize)} can't be zero");
+                throw new ValidationException(nameof(OriginalSize), "Can't be zero");
             }
             if (CurrentSize == 0)
             {
-                throw new FormatException($"{nameof(CurrentSize)} can't be zero");
+                throw new ValidationException(nameof(CurrentSize), $"Can't be zero");
             }
             if (CurrentSize % 512 != 0)
             {
-                throw new FormatException($"{nameof(CurrentSize)} must be a multiple of 512");
+                throw new ValidationException(nameof(CurrentSize), "Must be a multiple of 512");
             }
 
             if (DiskGeometry == null)
             {
-                throw new FormatException($"{nameof(DiskGeometry)} is not defined");
+                throw new ValidationException(nameof(DiskGeometry), "Is not defined");
             }
             if (DiskGeometry.Cylinders < 1 || DiskGeometry.Cylinders > CHS.MAX_CYLINDERS)
             {
-                throw new FormatException($"{nameof(DiskGeometry)}.{nameof(CHS.Cylinders)} must be in the range of 1-{CHS.MAX_CYLINDERS}");
+                throw new ValidationException(nameof(DiskGeometry) + nameof(CHS.Cylinders), $"Must be in the range of 1-{CHS.MAX_CYLINDERS}");
             }
             if (DiskGeometry.Heads < 1 || DiskGeometry.Heads > CHS.MAX_HEADS)
             {
-                throw new FormatException($"{nameof(DiskGeometry)}.{nameof(CHS.Heads)} must be in the range of 1-{CHS.MAX_HEADS}");
+                throw new ValidationException(nameof(DiskGeometry) + nameof(CHS.Heads), $"Must be in the range of 1-{CHS.MAX_HEADS}");
             }
             if (DiskGeometry.SectorsPerTrack < 1 || DiskGeometry.SectorsPerTrack > CHS.MAX_SECTORS_PER_TRACK)
             {
-                throw new FormatException($"{nameof(DiskGeometry)}.{nameof(CHS.SectorsPerTrack)} must be in the range of 1-{CHS.MAX_SECTORS_PER_TRACK}");
+                throw new ValidationException(nameof(DiskGeometry) + nameof(CHS.SectorsPerTrack), $"Must be in the range of 1-{CHS.MAX_SECTORS_PER_TRACK}");
             }
             if (!DiskGeometry.Equals(new CHS(CurrentSize)))
             {
-                throw new FormatException($"{nameof(DiskGeometry)} does not matches {nameof(CurrentSize)}");
+                throw new ValidationException(nameof(DiskGeometry), $"Does not matches {nameof(CurrentSize)}");
             }
 
 
             if (!Enum.IsDefined(typeof(VhdType), DiskType))
             {
-                throw new FormatException($"{nameof(DiskType)} is not one of the defined enum values");
+                throw new ValidationException(nameof(DiskType), "Not one of the defined enum values");
             }
 
             if (Checksum != ComputeChecksum())
             {
-                throw new FormatException($"{nameof(Checksum)} is invalid.");
+                throw new ValidationException(nameof(Checksum), $"Wrong checksum. Expected: {ComputeChecksum()}");
             }
 
             if (DiskId == Guid.Empty)
             {
-                throw new FormatException($"{nameof(DiskId)} is invalid");
+                throw new ValidationException(nameof(DiskId), "Is invalid (All zeros)");
             }
             if (Reserved == null || Reserved.Length != RESERVED_FIELD_SIZE)
             {
-                throw new FormatException($"{nameof(Reserved)} must be {RESERVED_FIELD_SIZE} bytes long");
+                throw new ValidationException(nameof(Reserved), $"Must be {RESERVED_FIELD_SIZE} bytes long");
             }
             if (Reserved.Any(m => m != 0))
             {
-                throw new FormatException($"{nameof(Reserved)} must be made up of nullbytes only");
+                throw new ValidationException(nameof(Reserved), "Must be made up of nullbytes only");
             }
         }
 
@@ -402,7 +402,7 @@ namespace vhd.VHD
                     BW.Write(Tools.ToNetwork((ushort)FileFormatVersion.Major));
                     BW.Write(Tools.ToNetwork((ushort)FileFormatVersion.Minor));
                     BW.Write(Tools.ToNetwork(DataOffset));
-                    BW.Write(Tools.ToNetwork((int)ToTimestamp(TimeStamp)));
+                    BW.Write(Tools.ToNetwork((int)VHD.ToDiskTimestamp(TimeStamp)));
 
                     BW.Write(Encoding.Default.GetBytes(CreatorApplication));
                     BW.Write(Tools.ToNetwork((ushort)CreatorVersion.Major));
@@ -446,32 +446,6 @@ namespace vhd.VHD
                 Sum += Data[i];
             }
             return ~Sum;
-        }
-
-        /// <summary>
-        /// Converts a DateTime object into a timestamp
-        /// </summary>
-        /// <param name="DT">DateTime object</param>
-        /// <returns>Timestamp</returns>
-        private double ToTimestamp(DateTime DT)
-        {
-            return DT
-                .ToUniversalTime()
-                .Subtract(new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                .TotalSeconds;
-        }
-
-        /// <summary>
-        /// Converts a Timestamp into a DateTime object
-        /// </summary>
-        /// <param name="Seconds">Number of seconds since 2000-01-01 00:00:00 UTC</param>
-        /// <returns>DateTime instance</returns>
-        /// <remarks><paramref name="Seconds"/> can also be negative although the format didn't exist back then</remarks>
-        private DateTime FromTimeStamp(double Seconds)
-        {
-            return (new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                .AddSeconds(Seconds)
-                .ToLocalTime();
         }
 
         /// <summary>
