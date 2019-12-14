@@ -10,7 +10,7 @@ namespace vhd
         {
             using (var FS = File.OpenRead(@"D:\VM\TestFixed.vhd"))
             {
-                var BootSector = new MBR.MBR(FS);
+                var BootSector = new MBR.MasterBootRecord(FS);
                 Console.Error.WriteLine(BootSector.Partitions.Count(m => m.Type != MBR.PartitionType.Empty));
                 //VHD.CreateVHD(1024 * 1024 * 100, VhdType.FixedDisk, FS, false);
             }

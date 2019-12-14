@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace vhd.MBR
 {
-    public class MBR
+    public class MasterBootRecord
     {
         /// <summary>
         /// Size of the bootstrap code
@@ -17,6 +17,10 @@ namespace vhd.MBR
         /// Size of an MBR
         /// </summary>
         public const int MBR_SIZE = 512;
+        /// <summary>
+        /// Default partition count in an MBR
+        /// </summary>
+        public const int PARTITION_COUNT = 4;
 
         /// <summary>
         /// Bootstrap executable code
@@ -33,19 +37,17 @@ namespace vhd.MBR
         /// </summary>
         public byte[] Signature { get; set; }
 
-
-
-        public MBR()
+        public MasterBootRecord()
         {
 
         }
 
-        public MBR(Stream Source)
+        public MasterBootRecord(Stream Source)
         {
             Read(Source);
         }
 
-        public MBR(byte[] Data)
+        public MasterBootRecord(byte[] Data)
         {
             if (Data == null)
             {
@@ -58,6 +60,37 @@ namespace vhd.MBR
             using (var MS = new MemoryStream(Data, false))
             {
                 Read(MS);
+            }
+        }
+
+        public void Validate()
+        {
+            if (Signature == null || Signature.Length != 2)
+            {
+                throw new FormatException($"{nameof(Signature)} is not a 2 byte value");
+            }
+            if (Signature[0]!=0x55 || Signature[1]!=0xAA)
+            {
+                throw new FormatException($"{nameof(Signature)} is not 55-AA");
+            }
+            if (BootstrapCode == null || BootstrapCode.Length != BOOTSTRAP_SIZE)
+            {
+                throw new FormatException($"{nameof(BootstrapCode)} is not {BOOTSTRAP_SIZE} bytes long");
+            }
+            if (Partitions == null || Partitions.Length != PARTITION_COUNT)
+            {
+                throw new FormatException($"{nameof(Partitions)} is not {PARTITION_COUNT} entries long");
+            }
+            for (var i = 0; i < PARTITION_COUNT; i++)
+            {
+                try
+                {
+                    Partitions[i].Validate();
+                }
+                catch (Exception ex)
+                {
+                    throw new FormatException($"{nameof(Partitions)}[{i}] failed to validate", ex);
+                }
             }
         }
 

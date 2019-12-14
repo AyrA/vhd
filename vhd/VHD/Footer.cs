@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace vhd
+namespace vhd.VHD
 {
     /// <summary>
     /// Represents a VHD header
     /// </summary>
-    public class Header
+    public class Footer
     {
         /// <summary>
         /// Default file format major version
@@ -36,6 +36,10 @@ namespace vhd
         /// Size of a regular VHD Header
         /// </summary>
         public const int HEADER_LENGTH = 512;
+        /// <summary>
+        /// The size in bytes of a sector
+        /// </summary>
+        public const int SECTOR_SIZE = 512;
 
         /// <summary>
         /// Identifies the original creator of the disk
@@ -149,7 +153,7 @@ namespace vhd
         /// <summary>
         /// Creates a VHD Header with most values set to their defaults
         /// </summary>
-        public Header()
+        public Footer()
         {
             Cookie = DEFAULT_COOKIE;
             FileFormatVersion = new Version(V_MAJOR_DEFAULT, V_MINOR_DEFAULT);
@@ -173,7 +177,7 @@ namespace vhd
         /// </summary>
         /// <param name="Data">Data, must be of at least <see cref="HEADER_LENGTH"/> size</param>
         /// <remarks>The data must start with the header but is allowed to contain excessive bytes which are ignored.</remarks>
-        public Header(byte[] Data)
+        public Footer(byte[] Data)
         {
             if (Data == null)
             {
@@ -198,7 +202,7 @@ namespace vhd
         /// </summary>
         /// <param name="S">Stream to read header from</param>
         /// <remarks>The stream must be positioned at the header start</remarks>
-        public Header(Stream S)
+        public Footer(Stream S)
         {
             FromStream(S);
         }
@@ -480,7 +484,7 @@ namespace vhd
         public override bool Equals(object obj)
         {
             //Note: Do not use "a is b" expression for type checking because this matches for derived types too.
-            if (obj == null || obj.GetType() != typeof(Header))
+            if (obj == null || obj.GetType() != typeof(Footer))
             {
                 return base.Equals(obj);
             }
@@ -499,7 +503,7 @@ namespace vhd
             //If you don't fear hell you can set it to zero,
             //but don't complain if false and zero suddenly equal a blank VHD header in a hashmap.
             int Code = 0x1F2E3D4C;
-            foreach (var Prop in typeof(Header).GetProperties())
+            foreach (var Prop in typeof(Footer).GetProperties())
             {
                 var v = Prop.GetValue(this);
                 if (v != null)

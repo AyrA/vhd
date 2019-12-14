@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace vhd
+namespace vhd.VHD
 {
     /// <summary>
-    /// Represents the CHS value in a VHD <see cref="Header"/>
+    /// Represents the CHS value in a VHD <see cref="Footer"/>
     /// </summary>
     public class CHS
     {

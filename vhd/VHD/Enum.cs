@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace vhd
+namespace vhd.VHD
 {
     /// <summary>
     /// Possible VHD features

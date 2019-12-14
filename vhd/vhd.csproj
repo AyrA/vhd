@@ -43,16 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CHS.cs" />
-    <Compile Include="Enum.cs" />
-    <Compile Include="Header.cs" />
+    <Compile Include="MBR\Enum.cs" />
+    <Compile Include="VHD\CHS.cs" />
+    <Compile Include="VHD\Enum.cs" />
+    <Compile Include="VHD\Footer.cs" />
     <Compile Include="MBR\CHS.cs" />
-    <Compile Include="MBR\MBR.cs" />
+    <Compile Include="MBR\MasterBootRecord.cs" />
     <Compile Include="MBR\PartitionTableEntry.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools.cs" />
-    <Compile Include="VHD.cs" />
+    <Compile Include="VHD\VHD.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

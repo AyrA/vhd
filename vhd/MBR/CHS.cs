@@ -35,6 +35,16 @@ namespace vhd.MBR
         public byte Sectors { get; set; }
 
         /// <summary>
+        /// Gets if this instance is empty
+        /// </summary>
+        public bool IsEmpty
+        {
+            get {
+                return Heads == 0 && Cylinders == 0 && Sectors == 0;
+            }
+        }
+
+        /// <summary>
         /// Initializes an empty CHS instance
         /// </summary>
         public CHS()
@@ -72,24 +82,18 @@ namespace vhd.MBR
         /// </summary>
         public void Validate()
         {
-            //Don't validate an empty entry
-            if (Heads == 0 && Sectors == 0 && Cylinders == 0)
+            //Empty entries are valid
+            if (IsEmpty)
             {
                 return;
             }
-            //Fail individual zero entries
-            if (Heads == 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(Heads), "Head count is zero");
-            }
+            
+            //Sectors starts counting at one instead of zero
             if (Sectors == 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(Sectors), "Sector count is zero");
             }
-            if (Cylinders == 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(Cylinders), "Cylinder count is zero");
-            }
+
             //Fail too large entries
             if (Sectors > MAX_SECTORS)
             {
